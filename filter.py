@@ -5,7 +5,6 @@ from model import A, B, C, Q, R
 
 
 def KalmanFilter(mu, u, z, Sigma):
-    ###YOUR CODE HERE###
 
     # prediction step
     mu_pred = A @ mu + B @ u

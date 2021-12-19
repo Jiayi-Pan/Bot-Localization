@@ -35,46 +35,14 @@ def checkCollision(p):
     return False
 
 
-def ParticleFilter(mu, u, z):
+def ParticleFilter(M, mu, u, z, particles, w):
     # Input: current state estimate mu, control u, measurement z
 
-    # initialize variables
-    # mu = np.array([[0.], [0.]])
-    Sigma = np.array([[1., 0.], [0., 1.]])
 
+    Sigma = np.array([[1, 0], [0, 1]])
     # execute control u
     mu_new = A @ mu + B @ u
-
-    # u = np.array([[0.], [0.]])
-    # z = np.array([[0.], [0.]])
-
-    M = 100  # number of particles
-    x = np.zeros((M, 2))
-    w = np.zeros(M)
-    # initialize particles
-    particles = np.zeros((M, 2))
-    # for paricle_i in range(M):
-    #     particle_sampled = np.random.multivariate_normal(mu, Sigma)
-    #     while checkCollision(particle_sampled):
-    #         particle_sampled = np.random.multivariate_normal(mu, Sigma)
-    #     particles[paricle_i] = particle_sampled
-    # particles[:,:] = np.random.multivariate_normal(mu.T, Sigma, M)
-    # initialize weights
-    # w[:] = 1./M
-    # run the filter
-    # for i in range(100):
-    # get measurement
-    # z[0] = np.random.normal(0, 1)
-    # z[1] = np.random.normal(0, 1)
-    # sample particles
-    for paricle_i in range(M):
-        particle_sampled = np.random.multivariate_normal(mu_new, Sigma)
-        while checkCollision(particle_sampled):
-            particle_sampled = np.random.multivariate_normal(mu_new, Sigma)
-        particles[paricle_i] = particle_sampled
-
-    # particles[:,:] = np.random.multivariate_normal(mu.reshape(-1), Sigma, M)
-
+    
     # update weights
     for j in range(M):
         x[:, j] = particles[:, j]
@@ -86,4 +54,4 @@ def ParticleFilter(mu, u, z):
     particles[:, :] = particles[:, ind]
 
     # return estimate (mean)
-    return particles.mean(axis=0)
+    return particles, w

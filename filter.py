@@ -39,15 +39,14 @@ def ParticleFilter(M, mu, u, z, particles, w):
     # Input: current state estimate mu, control u, measurement z
 
 
-    Sigma = np.array([[1, 0], [0, 1]])
+    Sigma = np.array([[1.0, 0.0], [0.0, 1.0]])
     # execute control u
     mu_new = A @ mu + B @ u
     
     # update weights
     for j in range(M):
-        x[:, j] = particles[:, j]
         w[j] = w[j] * (1./(2*np.pi*np.linalg.det(Sigma))) * np.exp(-0.5 *
-                                                                   (z - C @ x[:, j]) @ np.linalg.inv(R) @ (z - C @ x[:, j]))
+                                                                   (z - C @ particles[:, j]) @ np.linalg.inv(R) @ (z - C @ particles[:, j]))
     # resample
     w = w/np.sum(w)
     ind = np.random.choice(M, M, p=w)

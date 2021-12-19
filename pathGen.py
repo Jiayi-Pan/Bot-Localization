@@ -8,7 +8,7 @@ KeyPos = [[-6.5, 4], [-6.5, -7], [1, -7],
 # %%
 # Path with Noise
 STEP_SIZE = 0.25
-NOISE_SCALE = 0.1
+NOISE_SCALE = 0.18
 Path = []
 Noise_2 = [0, 0]
 for i in range(len(KeyPos)-1):

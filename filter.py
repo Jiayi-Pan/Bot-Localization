@@ -2,7 +2,7 @@ import numpy as np
 from model import A, B, C, Q, R
 
 #implement the Kalman filter in this function
-def KalmanFilter(mu, Sigma, z, u):
+def KalmanFilter(mu, u, z, Sigma):
     ###YOUR CODE HERE###
 
     #prediction step    
@@ -32,8 +32,10 @@ def checkCollision(p):
     
 
 def ParticleFilter(mu, u, z):
+    ## Input: current state estimate mu, control u, measurement z
+    
     #initialize variables
-    mu = np.array([[0.], [0.]])
+    # mu = np.array([[0.], [0.]])
     Sigma = np.array([[1., 0.], [0., 1.]])
     
     # u = np.array([[0.], [0.]])
@@ -51,29 +53,29 @@ def ParticleFilter(mu, u, z):
     #     particles[paricle_i] = particle_sampled
     # particles[:,:] = np.random.multivariate_normal(mu.T, Sigma, M)
     # initialize weights
-    w[:] = 1./M
+    # w[:] = 1./M
     # run the filter
-    for i in range(100):
+    # for i in range(100):
         # get measurement
         # z[0] = np.random.normal(0, 1)
         # z[1] = np.random.normal(0, 1)
         # sample particles
-        for paricle_i in range(M):
+    for paricle_i in range(M):
+        particle_sampled = np.random.multivariate_normal(mu, Sigma)
+        while checkCollision(particle_sampled):
             particle_sampled = np.random.multivariate_normal(mu, Sigma)
-            while checkCollision(particle_sampled):
-                particle_sampled = np.random.multivariate_normal(mu, Sigma)
-            particles[paricle_i] = particle_sampled
-        
-        # particles[:,:] = np.random.multivariate_normal(mu.reshape(-1), Sigma, M)
-        
-        # update weights
-        for j in range(M):
-            x[:,j] = particles[:,j]
-            w[j] = w[j] * (1./(2*np.pi*np.linalg.det(Sigma))) * np.exp(-0.5 * (z - C @ x[:,j]) @ np.linalg.inv(R) @ (z - C @ x[:,j]))
-        # resample
-        w = w/np.sum(w)
-        ind = np.random.choice(M, M, p=w)
-        particles[:,:] = particles[:,ind]
+        particles[paricle_i] = particle_sampled
+    
+    # particles[:,:] = np.random.multivariate_normal(mu.reshape(-1), Sigma, M)
+    
+    # update weights
+    for j in range(M):
+        x[:,j] = particles[:,j]
+        w[j] = w[j] * (1./(2*np.pi*np.linalg.det(Sigma))) * np.exp(-0.5 * (z - C @ x[:,j]) @ np.linalg.inv(R) @ (z - C @ x[:,j]))
+    # resample
+    w = w/np.sum(w)
+    ind = np.random.choice(M, M, p=w)
+    particles[:,:] = particles[:,ind]
     
     # return estimate (mean)
     return particles.mean(axis=0)

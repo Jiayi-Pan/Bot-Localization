@@ -38,6 +38,9 @@ def ParticleFilter(mu, u, z):
     # mu = np.array([[0.], [0.]])
     Sigma = np.array([[1., 0.], [0., 1.]])
     
+    # execute control u
+    mu_new = A @ mu + B @ u
+    
     # u = np.array([[0.], [0.]])
     # z = np.array([[0.], [0.]])
 
@@ -61,9 +64,9 @@ def ParticleFilter(mu, u, z):
         # z[1] = np.random.normal(0, 1)
         # sample particles
     for paricle_i in range(M):
-        particle_sampled = np.random.multivariate_normal(mu, Sigma)
+        particle_sampled = np.random.multivariate_normal(mu_new, Sigma)
         while checkCollision(particle_sampled):
-            particle_sampled = np.random.multivariate_normal(mu, Sigma)
+            particle_sampled = np.random.multivariate_normal(mu_new, Sigma)
         particles[paricle_i] = particle_sampled
     
     # particles[:,:] = np.random.multivariate_normal(mu.reshape(-1), Sigma, M)

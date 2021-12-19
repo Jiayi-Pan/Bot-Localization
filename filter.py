@@ -18,17 +18,14 @@ def KalmanFilter(mu, Sigma, z, u):
     ###YOUR CODE HERE###
     return mu_new, Sigma_new
 
-def ParticleFilter():
+def ParticleFilter(mu, u, z):
     #initialize variables
     mu = np.array([[0.], [0.]])
     Sigma = np.array([[1., 0.], [0., 1.]])
+    
     u = np.array([[0.], [0.]])
     z = np.array([[0.], [0.]])
-    A = np.array([[1., 0.], [0., 1.]])
-    B = np.array([[0.], [0.]])
-    C = np.array([[1., 0.], [0., 1.]])
-    Q = np.array([[0.1, 0.], [0., 0.1]])
-    R = np.array([[0.1, 0.], [0., 0.1]])
+
     M = 100 #number of particles
     x = np.zeros((2, M))
     w = np.zeros(M)

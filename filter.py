@@ -44,7 +44,12 @@ def ParticleFilter(mu, u, z):
     w = np.zeros(M)
     # initialize particles
     particles = np.zeros((M, 2))
-    particles[:,:] = np.random.multivariate_normal(mu.T, Sigma, M)
+    # for paricle_i in range(M):
+    #     particle_sampled = np.random.multivariate_normal(mu, Sigma)
+    #     while checkCollision(particle_sampled):
+    #         particle_sampled = np.random.multivariate_normal(mu, Sigma)
+    #     particles[paricle_i] = particle_sampled
+    # particles[:,:] = np.random.multivariate_normal(mu.T, Sigma, M)
     # initialize weights
     w[:] = 1./M
     # run the filter
@@ -53,7 +58,14 @@ def ParticleFilter(mu, u, z):
         # z[0] = np.random.normal(0, 1)
         # z[1] = np.random.normal(0, 1)
         # sample particles
-        particles[:,:] = np.random.multivariate_normal(mu.reshape(-1), Sigma, M)
+        for paricle_i in range(M):
+            particle_sampled = np.random.multivariate_normal(mu, Sigma)
+            while checkCollision(particle_sampled):
+                particle_sampled = np.random.multivariate_normal(mu, Sigma)
+            particles[paricle_i] = particle_sampled
+        
+        # particles[:,:] = np.random.multivariate_normal(mu.reshape(-1), Sigma, M)
+        
         # update weights
         for j in range(M):
             x[:,j] = particles[:,j]

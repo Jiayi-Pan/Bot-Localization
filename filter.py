@@ -1,7 +1,8 @@
 import numpy as np
+from model import A, B, C, Q, R
 
 #implement the Kalman filter in this function
-def KalmanFilter(mu, Sigma, z, u, A, B, C, Q, R):
+def KalmanFilter(mu, Sigma, z, u):
     ###YOUR CODE HERE###
 
     #prediction step    

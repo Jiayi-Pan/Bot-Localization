@@ -8,8 +8,8 @@ B = np.eye(2)
 C = np.eye(2)
 
 # motion noise covariance
-R = np.array([[1, 0],
-              [0, 1]])
+R = np.array([[0.005, 0.005],
+              [0.005, 0.005]])
 
 # sensor noise covariance
 Q = np.array([[0.04869528, -0.0058636],

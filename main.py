@@ -6,6 +6,7 @@ from pybullet_tools.pr2_utils import PR2_GROUPS
 import time
 import model
 import filter
+import json
 ### YOUR IMPORTS HERE ###
 
 #########################
@@ -21,6 +22,9 @@ def execute(robot, joints, path, sleep):
 def executeKalman(robot, joints, sleep):
     mu = np.array(model.Path_Real[0][:2])
     Sigma = np.zeros(mu.shape)
+    Real_Path = []
+    Sense_Path = []
+    Filtered_Path = []
     for i in range(1, len(model.Path_Real)):
         u = np.array(np.array(
             model.Path_Action[i][:2]) - np.array(model.Path_Action[i-1][:2]))  # action
@@ -31,13 +35,31 @@ def executeKalman(robot, joints, sleep):
         mu, Sigma = filter.KalmanFilter(mu, u, z, Sigma)
         wait_for_duration(sleep)
 
+#       Sensed Trajecgtory: Red
+        marker_pos_sense = z.tolist()
+        marker_pos_sense.append(1.4)
+        draw_sphere_marker(marker_pos_sense, 0.1, (1, 0, 0, 1))
+
+#       Filtered Trajecgtory: Blue
         marker_pos_filter = mu.tolist()
         marker_pos_filter.append(1.4)
-        draw_sphere_marker(marker_pos_filter, 0.1, (1, 0, 0, 1))
+        draw_sphere_marker(marker_pos_filter, 0.1, (0, 0, 1, 1))
 
+#       Groundtruth: Green
         marker_pos_real = model.Path_Real[i]
         marker_pos_real[2] = 1.4
         draw_sphere_marker(marker_pos_real, 0.1, (0, 1, 0, 1))
+
+#       Store
+        Sense_Path.append(z.tolist())
+        Filtered_Path.append(mu.tolist())
+        Real_Path.append(model.Path_Real[i][:2])
+    with open("KalmanSensePath.json",'w') as f:
+        json.dump(Sense_Path, f, indent=2) 
+    with open("KalmanFilteredPath.json",'w') as f:
+        json.dump(Filtered_Path, f, indent=2) 
+    with open("KalmanRealPath.json",'w') as f:
+        json.dump(Real_Path, f, indent=2) 
     print('Finished')
     input("Enter to continue")
 
@@ -49,13 +71,16 @@ def executeParticle(robot, joints, sleep):
     Sigma = np.array([[1.0, 0.0], [0.0, 1.0]])
 
     # initialize particles
-    M = 500 # number of particles
+    M = 100 # number of particles
     particles = np.zeros((M, 2))
+
+    Real_Path = []
+    Sense_Path = []
+    Filtered_Path = []
     for particle_i in range(M):
         particle_sampled = np.random.multivariate_normal(mu, Sigma)
         while filter.checkCollision(particle_sampled):
             particle_sampled = np.random.multivariate_normal(mu, Sigma)
-        print(particle_i)
         particles[particle_i] = particle_sampled
     w = np.ones(M) / M
 
@@ -80,13 +105,26 @@ def executeParticle(robot, joints, sleep):
         mu = (particles * w.reshape(-1, 1)).sum(axis=0)
         wait_for_duration(sleep)
 
+        
+#       Sensed Trajecgtory: Red
+        marker_pos_sense = z.tolist()
+        marker_pos_sense.append(1.4)
+        draw_sphere_marker(marker_pos_sense, 0.1, (1, 0, 0, 1))
+
+#       Filtered Trajecgtory: Blue
         marker_pos_filter = mu.tolist()
         marker_pos_filter.append(0.8)
-        draw_sphere_marker(marker_pos_filter, 0.1, (1, 0, 0, 1))
+        draw_sphere_marker(marker_pos_filter, 0.1, (0, 0, 1, 1))
 
+#       Groundtruth: Green
         marker_pos_real = model.Path_Real[i]
         marker_pos_real[2] = 1.4
         draw_sphere_marker(marker_pos_real, 0.1, (0, 1, 0, 1))
+
+#       Store
+        Sense_Path.append(z.tolist())
+        Filtered_Path.append(mu.tolist())
+        Real_Path.append(model.Path_Real[i][:2])
 
         # for particle_id, particle in enumerate(particles):
         #     marker_particle = list(particle)
@@ -96,11 +134,18 @@ def executeParticle(robot, joints, sleep):
         #     # marker_pos_real[2] = 1.4
         #     draw_sphere_marker(marker_particle, 0.1, (0, particle_id/M, 1, 1))
         # input()
+
+    with open("ParticleSensePath.json",'w') as f:
+        json.dump(Sense_Path, f, indent=2) 
+    with open("ParticleFilteredPath.json",'w') as f:
+        json.dump(Filtered_Path, f, indent=2) 
+    with open("ParticleRealPath.json",'w') as f:
+        json.dump(Real_Path, f, indent=2) 
     print('Finished')
     input("Enter to continue")
 
-
 def main(screenshot=False):
+    np.random.seed(42)
     # initialize PyBullet
     connect(use_gui=True)
     # load robot and obstacle resources
@@ -126,11 +171,10 @@ def main(screenshot=False):
     # execute_trajectory(robots['pr2'], base_joints, path, sleep=0.2)
     # execute(robots['pr2'], base_joints, model.Path,
     #         sleep=0.2)
-    # executeKalman(robots['pr2'], base_joints,
-    #               sleep=0.05)
-    executeParticle(robots['pr2'], base_joints,
-                    sleep=0.05)
-    # execute_trajectory(robots['pr2'], base_joints, model.Path_Real, sleep=0.2)
+    executeKalman(robots['pr2'], base_joints,
+                  sleep=0.01)
+    # executeParticle(robots['pr2'], base_joints,
+    #                 sleep=0.02)
 
     # Keep graphics window opened
     wait_if_gui()

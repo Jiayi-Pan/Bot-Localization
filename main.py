@@ -3,6 +3,7 @@ import numpy as np
 from utils import *
 from pybullet_tools.utils import connect, disconnect, get_joint_positions, wait_if_gui, set_joint_positions, joint_from_name, get_link_pose, link_from_name
 from pybullet_tools.pr2_utils import PR2_GROUPS
+import pybullet
 import time
 import model
 import filter
@@ -59,11 +60,9 @@ def executeKalman(robot, joints, sleep):
     with open("Data/KalmanRealPath.json",'w') as f:
         json.dump(Real_Path, f, indent=2) 
     print('Finished')
-    input("Enter to continue")
 
 
 def executeParticle(robot, joints, sleep):
-    np.random.seed(34)
     mu = np.array(model.Path_Real[0][:2])
     # Sigma = np.zeros(mu.shape)
     Sigma = np.array([[1.0, 0.0], [0.0, 1.0]])
@@ -141,7 +140,6 @@ def executeParticle(robot, joints, sleep):
     with open("Data/ParticleRealPath"+str(M)+".json",'w') as f:
         json.dump(Real_Path, f, indent=2) 
     print('Finished')
-    input("Enter to continue")
 
 def main(screenshot=False):
     np.random.seed(42)
@@ -154,24 +152,17 @@ def main(screenshot=False):
     base_joints = [joint_from_name(robots['pr2'], name)
                    for name in PR2_GROUPS['base']]
 
-    # collision_fn = get_collision_fn_PR2(
-    # robots['pr2'], base_joints, list(obstacles.values()))
-    # Example use of collision checking
-    # print("Robot colliding? ", collision_fn((0.5, -1.3, -np.pi/2)))
 
-    # Example use of setting body poses
-    # set_pose(obstacles['ikeatable6'], ((0, 0, 0), (1, 0, 0, 0)))
+    pybullet.resetDebugVisualizerCamera( cameraDistance=10, cameraYaw=0, cameraPitch=270.1, cameraTargetPosition=[3.5,-1,0])
 
-    # Example of draw
-    # draw_sphere_marker((0, 0, 1), 0.1, (1, 0, 0, 1))
-
-    start_config = tuple(get_joint_positions(robots['pr2'], base_joints))
-    ######################
-
-    executeKalman(robots['pr2'], base_joints,
-                  sleep=0.01)
-    # executeParticle(robots['pr2'], base_joints,
-    #                 sleep=0.02)
+    t0 = time.time()
+    
+    # executeKalman(robots['pr2'], base_joints,
+                #   sleep=0.00)
+    executeParticle(robots['pr2'], base_joints,
+                    sleep=0.01)
+    t1 = time.time()
+    print("=== Time: ", t1-t0, "s")
 
     # Keep graphics window opened
     wait_if_gui()

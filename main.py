@@ -25,9 +25,10 @@ def executeKalman(robot, joints, sleep):
     for i in range(1, len(model.Path_Real)):
         u = np.array(np.array(
             model.Path_Action[i][:2]) - np.array(model.Path_Action[i-1][:2]))  # action
-        z = np.array(model.Path_Real[i][:2])
-        z[0] += np.random.normal(0, 1.)  # observation noise
-        z[1] += np.random.normal(0, 1.)  # observation noise
+        # z = np.array(model.Path_Real[i][:2])
+        # z[0] += np.random.normal(0, 1.)  # observation noise
+        # z[1] += np.random.normal(0, 1.)  # observation noise
+        z = np.array(model.SensorInput[i][:2])
         set_joint_positions(robot, joints, model.Path_Real[i])
         mu, Sigma = filter.KalmanFilter(mu, u, z, Sigma)
         wait_for_duration(sleep)
@@ -68,7 +69,7 @@ def executeParticle(robot, joints, sleep):
     Sigma = np.array([[1.0, 0.0], [0.0, 1.0]])
 
     # initialize particles
-    M = 1000 # number of particles
+    M = 10000 # number of particles
     particles = np.zeros((M, 2))
 
     Real_Path = []
@@ -94,9 +95,10 @@ def executeParticle(robot, joints, sleep):
     for i in range(1, len(model.Path_Real)):
         u = np.array(np.array(
             model.Path_Action[i][:2]) - np.array(model.Path_Action[i-1][:2]))  # action
-        z = np.array(model.Path_Real[i][:2])
-        z[0] += np.random.normal(0, 1.)  # observation noise
-        z[1] += np.random.normal(0, 1.)  # observation noise
+        # z = np.array(model.Path_Real[i][:2])
+        # z[0] += np.random.normal(0, 1.)  # observation noise
+        # z[1] += np.random.normal(0, 1.)  # observation noise
+        z = np.array(model.SensorInput[i][:2])
         set_joint_positions(robot, joints, model.Path_Real[i])
         particles, w = filter.ParticleFilter(M, mu, u, z, particles, w)
         mu = (particles * w.reshape(-1, 1)).sum(axis=0)
@@ -165,13 +167,11 @@ def main(screenshot=False):
 
     start_config = tuple(get_joint_positions(robots['pr2'], base_joints))
     ######################
-    # execute_trajectory(robots['pr2'], base_joints, path, sleep=0.2)
-    # execute(robots['pr2'], base_joints, model.Path,
-    #         sleep=0.2)
-    # executeKalman(robots['pr2'], base_joints,
-                #   sleep=0.01)
-    executeParticle(robots['pr2'], base_joints,
-                    sleep=0.02)
+
+    executeKalman(robots['pr2'], base_joints,
+                  sleep=0.01)
+    # executeParticle(robots['pr2'], base_joints,
+    #                 sleep=0.02)
 
     # Keep graphics window opened
     wait_if_gui()

@@ -51,11 +51,11 @@ def executeKalman(robot, joints, sleep):
         Sense_Path.append(z.tolist())
         Filtered_Path.append(mu.tolist())
         Real_Path.append(model.Path_Real[i][:2])
-    with open("KalmanSensePath.json",'w') as f:
+    with open("Data/KalmanSensePath.json",'w') as f:
         json.dump(Sense_Path, f, indent=2) 
-    with open("KalmanFilteredPath.json",'w') as f:
+    with open("Data/KalmanFilteredPath.json",'w') as f:
         json.dump(Filtered_Path, f, indent=2) 
-    with open("KalmanRealPath.json",'w') as f:
+    with open("Data/KalmanRealPath.json",'w') as f:
         json.dump(Real_Path, f, indent=2) 
     print('Finished')
     input("Enter to continue")
@@ -123,8 +123,6 @@ def executeParticle(robot, joints, sleep):
         Filtered_Path.append(mu.tolist())
         Real_Path.append(model.Path_Real[i][:2])
 
-        if i > 30:
-            break
         # for particle_id, particle in enumerate(particles):
         #     marker_particle = list(particle)
         #     marker_particle.append(1.6)
@@ -134,12 +132,11 @@ def executeParticle(robot, joints, sleep):
         #     draw_sphere_marker(marker_particle, 0.1, (0, particle_id/M, 1, 1))
         # input()
 
-    print("save!!")
-    with open("ParticleSensePath.json",'w') as f:
+    with open("Data/ParticleSensePath"+str(M)+".json",'w') as f:
         json.dump(Sense_Path, f, indent=2) 
-    with open("ParticleFilteredPath.json",'w') as f:
+    with open("Data/ParticleFilteredPath"+str(M)+".json",'w') as f:
         json.dump(Filtered_Path, f, indent=2) 
-    with open("ParticleRealPath.json",'w') as f:
+    with open("Data/ParticleRealPath"+str(M)+".json",'w') as f:
         json.dump(Real_Path, f, indent=2) 
     print('Finished')
     input("Enter to continue")
@@ -171,10 +168,10 @@ def main(screenshot=False):
     # execute_trajectory(robots['pr2'], base_joints, path, sleep=0.2)
     # execute(robots['pr2'], base_joints, model.Path,
     #         sleep=0.2)
-    # executeKalman(robots['pr2'], base_joints,
-                #   sleep=0.01)
-    executeParticle(robots['pr2'], base_joints,
-                    sleep=0.02)
+    executeKalman(robots['pr2'], base_joints,
+                  sleep=0.01)
+    # executeParticle(robots['pr2'], base_joints,
+                    # sleep=0.02)
 
     # Keep graphics window opened
     wait_if_gui()

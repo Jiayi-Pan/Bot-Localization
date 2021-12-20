@@ -68,7 +68,7 @@ def executeParticle(robot, joints, sleep):
     Sigma = np.array([[1.0, 0.0], [0.0, 1.0]])
 
     # initialize particles
-    M = 100 # number of particles
+    M = 1000 # number of particles
     particles = np.zeros((M, 2))
 
     Real_Path = []
@@ -168,10 +168,10 @@ def main(screenshot=False):
     # execute_trajectory(robots['pr2'], base_joints, path, sleep=0.2)
     # execute(robots['pr2'], base_joints, model.Path,
     #         sleep=0.2)
-    executeKalman(robots['pr2'], base_joints,
-                  sleep=0.01)
-    # executeParticle(robots['pr2'], base_joints,
-                    # sleep=0.02)
+    # executeKalman(robots['pr2'], base_joints,
+                #   sleep=0.01)
+    executeParticle(robots['pr2'], base_joints,
+                    sleep=0.02)
 
     # Keep graphics window opened
     wait_if_gui()

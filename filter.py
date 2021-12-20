@@ -27,30 +27,58 @@ def checkCollision(p):
     y_limits = [[-8, 6], [-8, -6], [-8, 8], [0, 1], [0, 6], [4, 5], [-8, 6]]
     x, y = p
     assert len(x_limits) == len(y_limits)
-    for i in len(x_limits):
+    isPermissible = False
+    for i in range(len(x_limits)):
         if x < x_limits[i][0] or x > x_limits[i][1]:
-            return True
+            continue
         if y < y_limits[i][0] or y > y_limits[i][1]:
-            return True
-    return False
-
+            continue
+        isPermissible = True
+    return not isPermissible
 
 def ParticleFilter(M, mu, u, z, particles, w):
-    # Input: current state estimate mu, control u, measurement z
+    # Input: current state estimate mu, control u, measurement
+    np.random.seed(34)
 
-
-    Sigma = np.array([[1.0, 0.0], [0.0, 1.0]])
+    Sigma = np.array([[0.18, 0.0], [0.0, 0.18]])
     # execute control u
-    mu_new = A @ mu + B @ u
+    particles = (A @ particles.T + (B @ u).reshape(-1, 1)).T
+
+    for particle_id, particle in enumerate(particles):
+        particle_sampled = particle.copy()
+        particle_raw = particle.copy()
+        particle_sampled[0] = particle[0]
+        
+        particle_sampled += (B @ u).reshape(-1)
+        if checkCollision(particle_sampled):
+            particle_sampled_variance = particle_raw.copy()
+        else:
+        # particle_sampled[0] + np.random.normal(0, 1)
+        # particle_sampled[1] = particle[1] + np.random.normal(0, 1)
+        # particle[1] += np.random.normal(0, 1)
+            particle_sampled_variance = np.random.multivariate_normal(particle_sampled, Sigma)
+            while checkCollision(particle_sampled_variance):
+                particle_sampled_variance = np.random.multivariate_normal(particle_sampled, Sigma)
+                # particle_sampled[0] = particle[0] + np.random.normal(0, 1)
+                # particle_sampled[1] = particle[1] + np.random.normal(0, 1)
+                # particle[0] += np.random.normal(0, 1)
+                # particle[1] += np.random.normal(0, 1)
+                # particle_sampled = np.random.multivariate_normal(particles[particle_id], Sigma)
+        particles[particle_id] = particle_sampled_variance
     
+    # print(w)
+    # input()
     # update weights
     for j in range(M):
-        w[j] = w[j] * (1./(2*np.pi*np.linalg.det(Sigma))) * np.exp(-0.5 *
-                                                                   (z - C @ particles[:, j]) @ np.linalg.inv(R) @ (z - C @ particles[:, j]))
+        w[j] = (1./(2*np.pi*np.linalg.det(Sigma))) * np.exp(-0.5 * (z - C @ particles[j, :]) @ np.linalg.inv(R) @ (z - C @ particles[j, :]))
+        # w[j] = 1/np.linalg.norm(z-particles[j, :])
     # resample
     w = w/np.sum(w)
+    # print(w)
+    # print("weight min =", w.min())
+    # input()
     ind = np.random.choice(M, M, p=w)
-    particles[:, :] = particles[:, ind]
+    particles[:, :] = particles[ind, :]
 
     # return estimate (mean)
     return particles, w

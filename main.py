@@ -7,9 +7,6 @@ import time
 import model
 import filter
 import json
-### YOUR IMPORTS HERE ###
-
-#########################
 
 
 def execute(robot, joints, path, sleep):
@@ -126,6 +123,8 @@ def executeParticle(robot, joints, sleep):
         Filtered_Path.append(mu.tolist())
         Real_Path.append(model.Path_Real[i][:2])
 
+        if i > 30:
+            break
         # for particle_id, particle in enumerate(particles):
         #     marker_particle = list(particle)
         #     marker_particle.append(1.6)
@@ -135,6 +134,7 @@ def executeParticle(robot, joints, sleep):
         #     draw_sphere_marker(marker_particle, 0.1, (0, particle_id/M, 1, 1))
         # input()
 
+    print("save!!")
     with open("ParticleSensePath.json",'w') as f:
         json.dump(Sense_Path, f, indent=2) 
     with open("ParticleFilteredPath.json",'w') as f:
@@ -171,10 +171,10 @@ def main(screenshot=False):
     # execute_trajectory(robots['pr2'], base_joints, path, sleep=0.2)
     # execute(robots['pr2'], base_joints, model.Path,
     #         sleep=0.2)
-    executeKalman(robots['pr2'], base_joints,
-                  sleep=0.01)
-    # executeParticle(robots['pr2'], base_joints,
-    #                 sleep=0.02)
+    # executeKalman(robots['pr2'], base_joints,
+                #   sleep=0.01)
+    executeParticle(robots['pr2'], base_joints,
+                    sleep=0.02)
 
     # Keep graphics window opened
     wait_if_gui()

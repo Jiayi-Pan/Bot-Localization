@@ -1,5 +1,5 @@
 # Time
-- Base: 
+- Base: 16.698s # Base code without any filtering
 - Kalman: 17.176s
 - P10: 17.721s
 - P100: 19.542s

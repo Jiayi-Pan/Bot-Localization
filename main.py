@@ -10,10 +10,25 @@ import filter
 import json
 
 
-def execute(robot, joints, path, sleep):
+def executeBase(robot, joints, sleep):
+    # NOTE: Only for timer!
+    path = model.Path_Real
     for bq in path:
         set_joint_positions(robot, joints, bq)
         wait_for_duration(sleep)
+
+#         marker_pos_sense = bq
+#         draw_sphere_marker(marker_pos_sense, 0.1, (1, 0, 0, 1))
+
+# #       Filtered Trajecgtory: Blue
+#         marker_pos_filter = bq
+#         marker_pos_filter.append(1.4)
+#         draw_sphere_marker(marker_pos_filter, 0.1, (0, 0, 1, 1))
+
+#       Groundtruth: Green
+        marker_pos_real = bq
+        marker_pos_real[2] = 0
+        draw_sphere_marker(marker_pos_real, 0.1, (0, 1, 0, 1))
     print('Finished')
 
 
@@ -157,10 +172,12 @@ def main(screenshot=False):
 
     t0 = time.time()
     
+    executeBase(robots['pr2'], base_joints,
+                  sleep=0.00)
     # executeKalman(robots['pr2'], base_joints,
                 #   sleep=0.00)
-    executeParticle(robots['pr2'], base_joints,
-                    sleep=0.01)
+    # executeParticle(robots['pr2'], base_joints,
+    #                 sleep=0.01)
     t1 = time.time()
     print("=== Time: ", t1-t0, "s")
 

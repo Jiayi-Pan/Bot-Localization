@@ -70,8 +70,8 @@ def ParticleFilter(M, mu, u, z, particles, w):
     # input()
     # update weights
     for j in range(M):
-        w[j] = (1./(2*np.pi*np.linalg.det(Sigma))) * np.exp(-0.5 * (z - C @ particles[j, :]) @ np.linalg.inv(R) @ (z - C @ particles[j, :]))
-        # w[j] = 1/np.linalg.norm(z-particles[j, :])
+        # w[j] = (1./(2*np.pi*np.linalg.det(Sigma))) * np.exp(-0.5 * (z - C @ particles[j, :]) @ np.linalg.inv(R) @ (z - C @ particles[j, :]))
+        w[j] = 1/np.linalg.norm(z-particles[j, :])
     # resample
     w = w/np.sum(w)
     # print(w)

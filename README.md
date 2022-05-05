@@ -1,4 +1,4 @@
-# EECS 498 Algorithmic Robotics Final Project
+# Comparision and Analysis of Kalman Filter and Particle Filter in Robot Localization
 Final project for EECS 498 Introduction to Algorithmic Robotics, Fall 2021, University of Michigan
 
 > Author: Jiayi Pan, Changyuan Qiu (equal contributions)
